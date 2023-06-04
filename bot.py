@@ -174,8 +174,8 @@ async def on_message(message: discord.Message) -> None:
     for channel_id in channels:
         ctx = await bot.get_context(message)
         channel = bot.get_channel(int(channel_id[2:-1]))
-        message = f"<@{message.author.id}> @ {ctx.channel}:\n{message.content}"
-        await channel.send(content=message)
+        message_to_send = f"<@{message.author.id}> @ {ctx.channel}:\n{message.content}"
+        await channel.send(content=message_to_send)
         if channel_id == channels[-1]:
             return
     await bot.process_commands(message)
