@@ -14,6 +14,8 @@ from discord.ext.commands import Bot, Context
 
 import exceptions
 
+from helpers.db_manager import init_db
+
 if not os.path.isfile(f"{os.path.realpath(os.path.dirname(__file__))}/config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
 else:
@@ -120,18 +122,6 @@ file_handler.setFormatter(file_handler_formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 bot.logger = logger
-
-
-async def init_db():
-    async with aiosqlite.connect(
-        f"{os.path.realpath(os.path.dirname(__file__))}/database/database.db"
-    ) as db:
-        with open(
-            f"{os.path.realpath(os.path.dirname(__file__))}/database/schema.sql"
-        ) as file:
-            await db.executescript(file.read())
-        await db.commit()
-
 
 """
 Create a bot variable to access the config file in cogs so that you don't need to import it every time.
