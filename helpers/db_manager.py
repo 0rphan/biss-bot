@@ -158,3 +158,23 @@ async def get_warnings(user_id: int, server_id: int) -> list:
             for row in result:
                 result_list.append(row)
             return result_list
+
+async def add_student(student_id: int, gender: str, full_name: int, english_name: str, email: str, phone: str, address: str, birthday: str) -> None:
+    """
+    This function will add a new student to the database.
+    """
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        await db.execute(
+            "INSERT INTO students(id, gender, full_name, english_name, email, phone, address, birthday) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                student_id,
+                gender,
+                full_name,
+                english_name,
+                email,
+                phone,
+                address,
+                birthday
+            ),
+        )
+        await db.commit()
