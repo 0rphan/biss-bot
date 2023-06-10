@@ -2,6 +2,12 @@ from helpers import db_manager
 import csv
 import asyncio
 
+try:
+    file = open("database/.inited", 'r')
+    exit()
+except:
+    pass
+
 # In case the db does not exists create it here
 asyncio.run(db_manager.init_db())
 
@@ -17,4 +23,8 @@ with open("database/students.csv", 'r', encoding="utf8") as file:
         phone = row[5]
         birthday = row[-3]
         address = row[-2]
-        asyncio.run(db_manager.add_student(id, "male", full_name, english_name, email, phone, address, birthday))
+        asyncio.run(
+            db_manager.add_student(id, "male", full_name, english_name, email,
+                                   phone, address, birthday))
+
+open("database/.inited", 'w').close()
