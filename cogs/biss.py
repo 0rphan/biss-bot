@@ -6,6 +6,7 @@ from discord.ext.commands import Context
 from helpers import checks
 
 import csv
+import datetime
 
 
 class Biss(commands.Cog, name="biss"):
@@ -44,9 +45,19 @@ class Biss(commands.Cog, name="biss"):
         """
         with open("database/sahi.csv", 'r', encoding="utf8") as file:
             csvreader = csv.reader(file)
+            tomorrow = (datetime.datetime.now() +
+                        datetime.timedelta(days=1)).strftime("%-m/%d/%Y")
+            pretty_date = (datetime.datetime.now() +
+                           datetime.timedelta(days=1)).strftime("%d/%m/%Y")
             for row in csvreader:
-                print(row)
-        embed = discord.Embed(description="sahi", color=0xD75BF4)
+                if row[0] == tomorrow:
+                    embed = discord.Embed(
+                        title="סח\"י",
+                        description=f"הסח\"י לתאריך {pretty_date} זה {row[1]}",
+                        color=0xD75BF4)
+                    await context.send(embed=embed)
+                    return
+        embed = discord.Embed(description="אין סחי מחר", color=0xE02B2B)
         await context.send(embed=embed)
 
 
