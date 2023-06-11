@@ -9,6 +9,7 @@ python = "^3.10"
 aiohttp = "^3.8.4"
 aiosqlite = "^0.19.0"
 discord = "^2.2.3"
+Flask = "^2.3.2"
 
 [tool.poetry.dev-dependencies]
 

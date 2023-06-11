@@ -15,6 +15,7 @@ from discord.ext.commands import Bot, Context
 import exceptions
 
 from helpers.db_manager import init_db
+import keep_alive
 
 if not os.path.isfile(f"{os.path.realpath(os.path.dirname(__file__))}/config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
@@ -297,4 +298,5 @@ async def load_cogs() -> None:
 
 asyncio.run(init_db())
 asyncio.run(load_cogs())
+keep_alive.keep_alive()
 bot.run(config["token"])
