@@ -24,3 +24,10 @@ CREATE TABLE IF NOT EXISTS 'students' (
   'threads' int array[] NOT NULL DEFAULT [],
   'birthday' timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS 'scoreboards' (
+  'user_id' varchar(20) NOT NULL,
+  'game' int NOT NULL,
+  'score' varchar NOT NULL,
+  PRIMARY KEY (user_id, game)
+)
