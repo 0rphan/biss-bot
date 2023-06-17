@@ -1,9 +1,9 @@
-from helpers import db_manager
+import db_manager
 import csv
 import asyncio
 
 try:
-    file = open("database/.inited", 'r')
+    file = open("../database/.inited", 'r')
     exit()
 except:
     pass
@@ -11,7 +11,7 @@ except:
 # In case the db does not exists create it here
 asyncio.run(db_manager.init_db())
 
-with open("database/students.csv", 'r', encoding="utf8") as file:
+with open("../database/students.csv", 'r', encoding="utf8") as file:
     csvreader = csv.reader(file)
     for row in csvreader:
         break
@@ -27,4 +27,4 @@ with open("database/students.csv", 'r', encoding="utf8") as file:
             db_manager.add_student(id, "male", full_name, english_name, email,
                                    phone, address, birthday))
 
-open("database/.inited", 'w').close()
+open("../database/.inited", 'w')
