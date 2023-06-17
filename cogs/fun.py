@@ -1,14 +1,18 @@
 import json
 import random
+from enum import Enum
 
 import aiohttp
 import discord
+from discord import Color
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
 
 from helpers import checks
 
+class Games(Enum):
+    RPS = 1
 
 class Choice(discord.ui.View):
 
@@ -194,6 +198,24 @@ class Fun(commands.Cog, name="fun"):
         """
         view = RockPaperScissorsView()
         await context.send("Please make your choice", view=view)
+
+    @commands.hybrid_command(
+        name="score",
+        description="Get your score in a game")
+    @checks.not_blacklisted()
+    async def game_score(self, context: Context) -> None:
+        """
+        Get your score in a game
+
+        :param context: The hybrid command context.
+        """
+
+        embed = discord.Embed(
+            title=":trophy: Game Scores:",
+            color=Color.teal(),
+        )
+        embed.add_field(name="Rock Paper Scissors", value="Wins:\nDraws:\nLosses:", inline=False)
+        await context.send(embed=embed)
 
     @commands.hybrid_command(
         name="ping",

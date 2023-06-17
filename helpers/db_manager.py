@@ -1,3 +1,4 @@
+import json
 import os
 
 import aiosqlite
@@ -160,6 +161,45 @@ async def get_warnings(user_id: int, server_id: int) -> list:
             return result_list
 
 async def add_student(student_id: int, gender: str, full_name: int, english_name: str, email: str, phone: str, address: str, birthday: str) -> None:
+    """
+    This function will add a new student to the database.
+    """
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        await db.execute(
+            "INSERT INTO students(id, gender, full_name, english_name, email, phone, address, birthday) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                student_id,
+                gender,
+                full_name,
+                english_name,
+                email,
+                phone,
+                address,
+                birthday
+            ),
+        )
+        await db.commit()
+
+async def get_game_score_by_user(user_id: int, game: int) -> dict:
+    """
+    This function will add a new student to the database.
+    """
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        rows = await db.execute(
+            "SELECT score FROM scoreboards WHERE user_id=? and game=?",
+            (
+                user_id,
+                game
+            ),
+        )
+        async with rows as cursor:
+            result = await cursor.fetchall()
+            if result:
+                return json.loads(result)
+            return None
+
+
+async def save_game_score_by_user(user_id: int, game: int, score: str) -> None:
     """
     This function will add a new student to the database.
     """
