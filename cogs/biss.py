@@ -2,6 +2,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
+from discord.ext import tasks as discordTasks
 
 from helpers import checks
 
@@ -16,7 +17,7 @@ class Biss(commands.Cog, name="biss"):
 
     @commands.hybrid_command(
         name="info",
-        description="This command give command about a student",
+        description="This command gives info about a student",
     )
     @checks.not_blacklisted()
     @checks.is_owner()
@@ -69,6 +70,15 @@ class Biss(commands.Cog, name="biss"):
 
         embed = discord.Embed(description="אין 'אקטואליה יומית' היום או מחר", color=0xE02B2B)
         await context.send(embed=embed)
+
+    #loop for sending message
+    @discordTasks.loop(minutes=1.0)
+    async def auto_sahi(self, context: Context):
+        if datetime.datetime.now().strftime('%A').lower() in ["friday", "saturday"]:
+            return
+        if (datetime.datetime.now().hour == "7") and (datetime.datetime.now().strftime('%M') == "30"):
+            await self.sahi(context)
+
 
 
 async def setup(bot):
