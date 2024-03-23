@@ -47,17 +47,27 @@ class Biss(commands.Cog, name="biss"):
             csvreader = csv.reader(file)
             tomorrow = (datetime.datetime.now() +
                         datetime.timedelta(days=1)).strftime("%-m/%d/%Y")
-            pretty_date = (datetime.datetime.now() +
+            today = (datetime.datetime.now()).strftime("%-m/%d/%Y")
+            pretty_tomorrow = (datetime.datetime.now() +
                            datetime.timedelta(days=1)).strftime("%d/%m/%Y")
+            pretty_today = (datetime.datetime.now()).strftime("%d/%m/%Y")
+
+            desc = f""
             for row in csvreader:
+                if row[0] == today:
+                    desc += f"[{pretty_today}] הסח\"י היום - {row[1]}\n"
                 if row[0] == tomorrow:
-                    embed = discord.Embed(
-                        title="סח\"י",
-                        description=f"הסח\"י לתאריך {pretty_date} זה {row[1]}",
-                        color=0xD75BF4)
-                    await context.send(embed=embed)
-                    return
-        embed = discord.Embed(description="אין סחי מחר", color=0xE02B2B)
+                    desc += f"[{pretty_tomorrow}] הסח\"י מחר - {row[1]}\n"
+
+            if desc:
+                embed = discord.Embed(
+                    title="סח\"י",
+                    description=desc,
+                    color=0xD75BF4)
+                await context.send(embed=embed)
+                return
+
+        embed = discord.Embed(description="אין סחי היום או מחר", color=0xE02B2B)
         await context.send(embed=embed)
 
 
