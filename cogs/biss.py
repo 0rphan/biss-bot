@@ -54,10 +54,10 @@ class Biss(commands.Cog, name="biss"):
 
             desc = f""
             for row in csvreader:
-                if row[0] == tomorrow:
-                    desc += f"הסח\"י לתאריך {pretty_tomorrow} זה {row[1]}\n"
                 if row[0] == today:
-                    desc += f"הסח\"י לתאריך {pretty_today} זה {row[1]}\n"
+                    desc += f"[{pretty_today}] הסח\"י היום - {row[1]}\n"
+                if row[0] == tomorrow:
+                    desc += f"[{pretty_tomorrow}] הסח\"י מחר - {row[1]}\n"
 
             if desc:
                 embed = discord.Embed(
@@ -66,7 +66,8 @@ class Biss(commands.Cog, name="biss"):
                     color=0xD75BF4)
                 await context.send(embed=embed)
                 return
-        embed = discord.Embed(description="אין סחי מחר", color=0xE02B2B)
+
+        embed = discord.Embed(description="אין סחי היום או מחר", color=0xE02B2B)
         await context.send(embed=embed)
 
 
