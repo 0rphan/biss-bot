@@ -57,7 +57,7 @@ class Biss(commands.Cog, name="biss"):
                 if row[0] == tomorrow:
                     desc += f"הסח\"י לתאריך {pretty_tomorrow} זה {row[1]}\n"
                 if row[0] == today:
-                    desc += f"הסח\"י לתאריך {pretty_today} זה {row[1]}"
+                    desc += f"הסח\"י לתאריך {pretty_today} זה {row[1]}\n"
 
             if desc:
                 embed = discord.Embed(
