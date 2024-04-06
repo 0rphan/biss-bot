@@ -78,15 +78,16 @@ class Biss(commands.Cog, name="biss"):
 
 
     # @tasks.loop(time=datetime.time(hour=7, minute=30))
-    @tasks.loop(time=datetime.time(hour=14, minute=25))
+    @tasks.loop(time=datetime.time(hour=14, minute=30))
     async def daily_sahi(self):
         """
         This command gives you today's and tomorrow's sahi.
         Almost everyday at 7:30 AM.
         """
 
-        if datetime.datetime.now().strftime('%A').lower() in ["friday", "saturday"]:
-            return
+        # if datetime.datetime.now().strftime('%A').lower() in ["friday", "saturday"]:
+        #     print("No auto-sahi on the weekend.")
+        #     return
 
         channel = self.bot.get_channel("1214585866966532146") # 1214585867578908688
 
