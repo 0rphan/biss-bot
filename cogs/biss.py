@@ -34,7 +34,7 @@ class Biss(commands.Cog, name="biss"):
 
     @commands.hybrid_command(
         name="sahi",
-        description="This command gives you today's and tomorrow's sahi",
+        description="This command gives you today's and tomorrow's 'sahi'",
     )
     @checks.not_blacklisted()
     async def sahi(self, context: Context):
@@ -46,8 +46,8 @@ class Biss(commands.Cog, name="biss"):
         with open("database/sahi.csv", 'r', encoding="utf8") as file:
             csvreader = csv.reader(file)
             tomorrow = (datetime.datetime.now() +
-                        datetime.timedelta(days=1)).strftime("%-m/%d/%Y")
-            today = (datetime.datetime.now()).strftime("%-m/%d/%Y")
+                        datetime.timedelta(days=1)).strftime("%m/%d/%y")
+            today = (datetime.datetime.now()).strftime("%m/%d/%y")
             pretty_tomorrow = (datetime.datetime.now() +
                            datetime.timedelta(days=1)).strftime("%d/%m/%Y")
             pretty_today = (datetime.datetime.now()).strftime("%d/%m/%Y")
@@ -55,19 +55,19 @@ class Biss(commands.Cog, name="biss"):
             desc = f""
             for row in csvreader:
                 if row[0] == today:
-                    desc += f"[{pretty_today}] הסח\"י היום - {row[1]}\n"
+                    desc += f"[{pretty_today}] מעביר האקטואליה היומית היום - {row[1]}\n"
                 if row[0] == tomorrow:
-                    desc += f"[{pretty_tomorrow}] הסח\"י מחר - {row[1]}\n"
+                    desc += f"[{pretty_tomorrow}] מעביר האקטואליה היומית מחר - {row[1]}\n"
 
             if desc:
                 embed = discord.Embed(
-                    title="סח\"י",
+                    title="אקטואליה יומית",
                     description=desc,
                     color=0xD75BF4)
                 await context.send(embed=embed)
                 return
 
-        embed = discord.Embed(description="אין סחי היום או מחר", color=0xE02B2B)
+        embed = discord.Embed(description="אין 'אקטואליה יומית' היום או מחר", color=0xE02B2B)
         await context.send(embed=embed)
 
 
