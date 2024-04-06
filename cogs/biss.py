@@ -78,16 +78,16 @@ class Biss(commands.Cog, name="biss"):
 
 
     # @tasks.loop(time=datetime.time(hour=7, minute=30))
-    @tasks.loop(time=datetime.time(hour=13, minute=52))
+    @tasks.loop(time=datetime.time(hour=14, minute=8))
     async def daily_sahi(self):
         """
         This command gives you today's and tomorrow's sahi.
         Almost everyday at 7:30 AM.
         """
-        
+
         if datetime.datetime.now().strftime('%A').lower() in ["friday", "saturday"]:
             return
-        
+
         channel = self.bot.get_channel("1214585866966532146") # 1214585867578908688
 
         desc = get_sahi()
@@ -99,7 +99,7 @@ class Biss(commands.Cog, name="biss"):
                 color=0xD75BF4)
             await channel.send(embed=embed)
             return
-        
+
         embed = discord.Embed(description="אין 'אקטואליה יומית' היום או מחר", color=0xE02B2B)
         await channel.send(embed=embed)
 
