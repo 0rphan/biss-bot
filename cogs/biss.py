@@ -78,7 +78,7 @@ class Biss(commands.Cog, name="biss"):
 
 
     # @tasks.loop(time=datetime.time(hour=7, minute=30))
-    @tasks.loop(time=datetime.time(hour=14, minute=8))
+    @tasks.loop(time=datetime.time(hour=14, minute=25))
     async def daily_sahi(self):
         """
         This command gives you today's and tomorrow's sahi.
