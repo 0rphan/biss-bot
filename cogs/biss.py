@@ -1,13 +1,32 @@
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import tasks, commands
 from discord.ext.commands import Context
-from discord.ext import tasks as discordTasks
 
 from helpers import checks
 
 import csv
 import datetime
+
+def get_sahi() -> str:
+    """ This command gives you today's and tomorrow's 'sahi' """
+    with open("database/sahi.csv", 'r', encoding="utf8") as file:
+        csvreader = csv.reader(file)
+        tomorrow = (datetime.datetime.now() +
+                    datetime.timedelta(days=1)).strftime("%m/%d/%y")
+        today = (datetime.datetime.now()).strftime("%m/%d/%y")
+        pretty_tomorrow = (datetime.datetime.now() +
+                        datetime.timedelta(days=1)).strftime("%d/%m/%Y")
+        pretty_today = (datetime.datetime.now()).strftime("%d/%m/%Y")
+
+        desc = f""
+        for row in csvreader:
+            if row[0] == today:
+                desc += f"[{pretty_today}] מעביר האקטואליה היומית היום - {row[1]}\n"
+            if row[0] == tomorrow:
+                desc += f"[{pretty_tomorrow}] מעביר האקטואליה היומית מחר - {row[1]}\n"
+
+        return desc
 
 
 class Biss(commands.Cog, name="biss"):
@@ -44,41 +63,45 @@ class Biss(commands.Cog, name="biss"):
 
         :param context: The application command context.
         """
-        with open("database/sahi.csv", 'r', encoding="utf8") as file:
-            csvreader = csv.reader(file)
-            tomorrow = (datetime.datetime.now() +
-                        datetime.timedelta(days=1)).strftime("%m/%d/%y")
-            today = (datetime.datetime.now()).strftime("%m/%d/%y")
-            pretty_tomorrow = (datetime.datetime.now() +
-                           datetime.timedelta(days=1)).strftime("%d/%m/%Y")
-            pretty_today = (datetime.datetime.now()).strftime("%d/%m/%Y")
+        desc = get_sahi()
 
-            desc = f""
-            for row in csvreader:
-                if row[0] == today:
-                    desc += f"[{pretty_today}] מעביר האקטואליה היומית היום - {row[1]}\n"
-                if row[0] == tomorrow:
-                    desc += f"[{pretty_tomorrow}] מעביר האקטואליה היומית מחר - {row[1]}\n"
-
-            if desc:
-                embed = discord.Embed(
-                    title="אקטואליה יומית",
-                    description=desc,
-                    color=0xD75BF4)
-                await context.send(embed=embed)
-                return
+        if desc:
+            embed = discord.Embed(
+                title="אקטואליה יומית",
+                description=desc,
+                color=0xD75BF4)
+            await context.send(embed=embed)
+            return
 
         embed = discord.Embed(description="אין 'אקטואליה יומית' היום או מחר", color=0xE02B2B)
         await context.send(embed=embed)
 
-    #loop for sending message
-    @discordTasks.loop(minutes=1.0)
-    async def auto_sahi(self, context: Context):
+
+    # @tasks.loop(time=datetime.time(hour=7, minute=30))
+    @tasks.loop(time=datetime.time(hour=13, minute=52))
+    async def daily_sahi(self):
+        """
+        This command gives you today's and tomorrow's sahi.
+        Almost everyday at 7:30 AM.
+        """
+        
         if datetime.datetime.now().strftime('%A').lower() in ["friday", "saturday"]:
             return
-        if (datetime.datetime.now().hour == "7") and (datetime.datetime.now().strftime('%M') == "30"):
-            await self.sahi(context)
+        
+        channel = self.bot.get_channel("1214585866966532146") # 1214585867578908688
 
+        desc = get_sahi()
+
+        if desc:
+            embed = discord.Embed(
+                title="אקטואליה יומית",
+                description=desc,
+                color=0xD75BF4)
+            await channel.send(embed=embed)
+            return
+        
+        embed = discord.Embed(description="אין 'אקטואליה יומית' היום או מחר", color=0xE02B2B)
+        await channel.send(embed=embed)
 
 
 async def setup(bot):
