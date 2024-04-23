@@ -92,11 +92,12 @@ class Biss(commands.Cog, name="biss"):
 
         print("JK JK")
 
-        channel = self.bot.get_channel("1214585866966532146") # 1214585866966532146
-        channel2 = self.bot.get_channel("1214585867578908688") # 1214585867578908688
+        # https://discord.com/channels/1214585866966532146/1214585867578908691
+        server_id = self.bot.get_guild("1214585866966532146") # 1214585866966532146
+        channel_id = self.bot.get_channel("1214585867578908691") # 1214585867578908691
 
-        print(channel, channel2)
-        print(type(channel), type(channel2))
+        print(server_id, channel_id)
+        print(type(server_id), type(channel_id))
 
         desc = get_sahi()
         print(f"desc: {desc}")
@@ -106,11 +107,11 @@ class Biss(commands.Cog, name="biss"):
                 title="אקטואליה יומית",
                 description=desc,
                 color=0xD75BF4)
-            await channel.send(embed=embed)
+            await channel_id.send(embed=embed)
             return
 
         embed = discord.Embed(description="אין 'אקטואליה יומית' היום או מחר", color=0xE02B2B)
-        await channel.send(embed=embed)
+        await channel_id.send(embed=embed)
 
 
 async def setup(bot):
