@@ -1,12 +1,10 @@
 import aiohttp
 import discord
+import datetime
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from helpers import checks
-
-import csv
-import datetime
+from helpers import checks, calendar
 
 
 class Biss(commands.Cog, name="biss"):
@@ -30,6 +28,55 @@ class Biss(commands.Cog, name="biss"):
         async with aiohttp.ClientSession() as session:
             embed = discord.Embed(
                 description="Hanich Hanichi\nהערות משמעות: 69", color=0xD75BF4)
+            await context.send(embed=embed)
+
+    @commands.hybrid_command(
+        name="looz",
+        description="This command gives you today's looz",
+    )
+    @checks.not_blacklisted()
+    async def looz(self, context: Context):
+        """"
+        This command gives you today's looz
+
+        :param context: The application command context.
+        """
+        events = calendar.get_daily_events()
+        if events is None:
+            return
+        if not events:
+            async with aiohttp.ClientSession() as session:
+                embed = discord.Embed(
+                    description='אין לו"ז להיום! חבורת חפשנים!', color=0xD75BF4)
+                await context.send(embed=embed)
+            return
+
+        start_times = ''
+        end_times = ''
+        summaries = ''
+
+        if events:
+            for event in events:
+                is_all_day = bool(event["start"].get("dateTime", False))
+                if not is_all_day:
+                    date = event["start"]["date"]
+                    start_times += f'{date}\n'
+                    end_times += 'כל היום\n'
+                else:
+                    start_time = datetime.datetime.fromisoformat(event["start"]["dateTime"])
+                    end_time = datetime.datetime.fromisoformat(event["end"]["dateTime"])
+                    start_hour = start_time.strftime('%H:%M')
+                    end_hour = end_time.strftime('%H:%M')
+                    start_times += f'{start_hour}\n'
+                    end_times += f'{end_hour}\n'
+                summaries += f'{event["summary"]}\n'
+
+        async with aiohttp.ClientSession() as session:
+            embed = discord.Embed(
+                title='הלו"ז להיום:', color=0xD75BF4)
+            embed.add_field(name='התחלה', value=start_times, inline=True)
+            embed.add_field(name='סיום', value=end_times, inline=True)
+            embed.add_field(name='תיאור', value=summaries, inline=True)
             await context.send(embed=embed)
 
     @commands.hybrid_command(
