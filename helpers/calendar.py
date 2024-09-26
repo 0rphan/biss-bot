@@ -63,7 +63,6 @@ def get_daily_events(day: datetime=None) -> Optional[list[dict[str, Any]]]:
                 calendarId="bissmg19@gmail.com",
                 timeMin=today_iso,
                 timeMax=tomorrow_iso,
-                # maxResults=10,
                 singleEvents=True,
                 orderBy="startTime",
             )
