@@ -1,6 +1,10 @@
+import json
+import datetime
+from pathlib import Path
+
 import aiohttp
 import discord
-import datetime
+
 from discord.ext import commands
 from discord.ext.commands import Context
 
@@ -11,6 +15,8 @@ class Biss(commands.Cog, name="biss"):
 
     def __init__(self, bot):
         self.bot = bot
+        with open(Path(__file__).parent.parent.joinpath('config.json')) as config_file:
+            self.config = json.load(config_file)
 
     @commands.hybrid_command(
         name="info",
@@ -32,18 +38,26 @@ class Biss(commands.Cog, name="biss"):
 
     @commands.hybrid_command(
         name="looz",
-        description="This command gives you today's looz",
+        description="This command gives you today's looz. Can also take a date in the format dd-mm-yyyy as input.",
     )
     @checks.not_blacklisted()
-    async def looz(self, context: Context):
+    async def looz(self, context: Context, date: str = None):
         """"
         This command gives you today's looz
+        Can also take a date in the format dd-mm-yyyy as input.
 
         :param context: The application command context.
         """
-        events = calendar.get_daily_events()
+        DATE_FORMAT = '%d-%m-%Y'
+        TIME_FORMAT = '%H:%M'
+
+        if not date:
+            date = datetime.datetime.today().strftime(DATE_FORMAT)
+
+        events = calendar.get_daily_events(self.config['calendar_id'], datetime.datetime.strptime(date, DATE_FORMAT))
         if events is None:
             return
+
         if not events:
             async with aiohttp.ClientSession() as session:
                 embed = discord.Embed(
@@ -51,32 +65,34 @@ class Biss(commands.Cog, name="biss"):
                 await context.send(embed=embed)
             return
 
-        start_times = ''
-        end_times = ''
-        summaries = ''
+        embed = discord.Embed(title='לו"ז להיום', color=0xD75BF4)
 
-        if events:
-            for event in events:
-                is_all_day = bool(event["start"].get("dateTime", False))
-                if not is_all_day:
-                    date = event["start"]["date"]
-                    start_times += f'{date}\n'
-                    end_times += 'כל היום\n'
-                else:
-                    start_time = datetime.datetime.fromisoformat(event["start"]["dateTime"])
-                    end_time = datetime.datetime.fromisoformat(event["end"]["dateTime"])
-                    start_hour = start_time.strftime('%H:%M')
-                    end_hour = end_time.strftime('%H:%M')
-                    start_times += f'{start_hour}\n'
-                    end_times += f'{end_hour}\n'
-                summaries += f'{event["summary"]}\n'
+        for index, event in enumerate(events):
+            if index and index % 25 == 0:  # Max amount of fields in a single embed
+                async with aiohttp.ClientSession() as session:
+                    await context.send(embed=embed)
+                embed = discord.Embed(color=0xD75BF4)
+
+            start = None
+            end = None
+            is_all_day = bool(event["start"].get("dateTime", False))
+            if not is_all_day:
+                start = event["start"]["date"]
+                if datetime.datetime.strptime(date, DATE_FORMAT) < datetime.datetime.strptime(start, '%Y-%m-%d'):
+                    continue
+                end = 'כל היום'
+            else:
+                start_time = datetime.datetime.fromisoformat(event["start"]["dateTime"])
+                end_time = datetime.datetime.fromisoformat(event["end"]["dateTime"])
+                start_hour = start_time.strftime(TIME_FORMAT)
+                end_hour = end_time.strftime(TIME_FORMAT)
+                start = start_hour
+                end = end_hour
+            embed.add_field(name='',
+                            value=f'{start} - {end} : {event["summary"]}',
+                            inline=False)
 
         async with aiohttp.ClientSession() as session:
-            embed = discord.Embed(
-                title='הלו"ז להיום:', color=0xD75BF4)
-            embed.add_field(name='התחלה', value=start_times, inline=True)
-            embed.add_field(name='סיום', value=end_times, inline=True)
-            embed.add_field(name='תיאור', value=summaries, inline=True)
             await context.send(embed=embed)
 
     @commands.hybrid_command(
