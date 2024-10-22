@@ -3,6 +3,7 @@
   "token": "<ENTER_TOKEN>",
   "permissions": "8",
   "application_id": "1111198676442955838",
+  "calendar_id": "<ENTER_ID>",
   "sync_commands_globally": false,
   "owners": [
     263731878622789633
