@@ -1,0 +1,18 @@
+[config]
+prefix = "/"
+token = "<ENTER_TOKEN>"
+premissions = 8
+application_id = 1111198676442955838
+sync_commands_globally = false
+owners = [263731878622789633, 413395214267449344]
+
+[calendar]
+main_id = "<ENTER_ID>"
+
+# This is an example of schedule configuration
+
+# [[schedule]]                      Every scheduled message should have this prefix
+# days = [0, 1, 2, 3, 4, 5, 6]      List of weekdays to run the command, ranging from 0 (sunday) to 6 (saturday)
+# hour = "10:00"                    Time to run the command, in %H:%M:%S format
+# url = "<ENTER_WEBHOOK_URL>"       Webhook URL to the chat the message should be sent in
+# content = "<ENTER_CONTENT>"       Message content

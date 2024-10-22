@@ -1,5 +1,5 @@
 import asyncio
-import json
+import toml
 import logging
 import os
 import platform
@@ -16,11 +16,11 @@ import exceptions
 
 from helpers.db_manager import init_db
 
-if not os.path.isfile(f"{os.path.realpath(os.path.dirname(__file__))}/config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
+if not os.path.isfile(f"{os.path.realpath(os.path.dirname(__file__))}/config.toml"):
+    sys.exit("'config.toml' not found! Please add it and try again.")
 else:
-    with open(f"{os.path.realpath(os.path.dirname(__file__))}/config.json") as file:
-        config = json.load(file)
+    with open(f"{os.path.realpath(os.path.dirname(__file__))}/config.toml") as file:
+        config = toml.load(file)["config"]
 
 """	
 Setup bot intents (events restrictions)
@@ -167,10 +167,9 @@ async def on_message(message: discord.Message) -> None:
 
     :param message: The message that was sent.
     """
-
-    if message.author == bot.user or message.author.bot:
-        return
     channels = check_channel_in_msg(message.content)
+    if channels and (message.author == bot.user or message.author.bot):
+        return
     for channel_id in channels:
         ctx = await bot.get_context(message)
         channel = bot.get_channel(int(channel_id[2:-1]))
@@ -178,8 +177,11 @@ async def on_message(message: discord.Message) -> None:
         await channel.send(content=message_to_send)
         if channel_id == channels[-1]:
             return
-    await bot.process_commands(message)
 
+    # This code is here instead of calling bot.process_commands, to allow processing commands sent by webhooks
+    ctx = await bot.get_context(message)
+    # the type of the invocation context's bot attribute will be correct
+    await bot.invoke(ctx)  # type: ignore
 
 @bot.event
 async def on_command_completion(context: Context) -> None:

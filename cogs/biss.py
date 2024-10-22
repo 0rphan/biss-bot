@@ -1,4 +1,4 @@
-import json
+import toml
 import datetime
 from pathlib import Path
 
@@ -19,8 +19,8 @@ class Biss(commands.Cog, name="biss"):
 
     def __init__(self, bot):
         self.bot = bot
-        with open(Path(__file__).parent.parent.joinpath('config.json')) as config_file:
-            self.config = json.load(config_file)
+        with open(Path(__file__).parent.parent.joinpath('config.toml')) as config_file:
+            self.config = toml.load(config_file)
 
     @commands.hybrid_command(
         name="info",
@@ -55,7 +55,7 @@ class Biss(commands.Cog, name="biss"):
         if not date:
             date = datetime.datetime.today().strftime(self.DATE_FORMAT)
 
-        events = calendar.get_daily_events(self.config['calendar_id'], datetime.datetime.strptime(date, self.DATE_FORMAT))
+        events = calendar.get_daily_events(self.config['calendar']['main_id'], datetime.datetime.strptime(date, self.DATE_FORMAT))
         if events is None:
             return
 
@@ -109,8 +109,8 @@ class Biss(commands.Cog, name="biss"):
         today = datetime.datetime.today()
         tomorrow = today + datetime.timedelta(days=1)
 
-        today_events = calendar.get_daily_events(self.config['calendar_id'], today)
-        tomorrow_events = calendar.get_daily_events(self.config['calendar_id'], tomorrow)
+        today_events = calendar.get_daily_events(self.config['calendar']['main_id'], today)
+        tomorrow_events = calendar.get_daily_events(self.config['calendar']['main_id'], tomorrow)
 
         found_today, found_tomorrow = False, False
 
@@ -128,7 +128,8 @@ class Biss(commands.Cog, name="biss"):
                 continue
             found_tomorrow = True
             madrat = discord_tools.match_channel_member(context, data[0])
-            await context.send('@everyone ' + 'המדר"ת למחר - ' + f'<@{madrat.id}>')
+            await context.send('המדר"ת למחר - ' + f'<@{madrat.id}>')
+
         if not all([found_today, found_tomorrow]):
             await context.send('לא נמצא מדרת - ' +
                                ('היום' if not found_today else '') +
@@ -148,7 +149,7 @@ class Biss(commands.Cog, name="biss"):
         """
         today = datetime.datetime.today()
 
-        today_events = calendar.get_daily_events(self.config['calendar_id'], today)
+        today_events = calendar.get_daily_events(self.config['calendar']['main_id'], today)
 
         found_today = False
         for event in today_events:
@@ -158,11 +159,12 @@ class Biss(commands.Cog, name="biss"):
             found_today = True
             toran_1 = discord_tools.match_channel_member(context, data[0])
             toran_2 = discord_tools.match_channel_member(context, data[1])
+
             if toran_1 is None or toran_2 is None:
                 await context.send('השם של אחד התורנים בקאלנדר לא נמצא בשרת! ככל הנראה מדובר בשגיאת כתיב.')
                 return
 
-            await context.send('@everyone ' + 'תורני הניקיון והפריסה להיום - ' + f'<@{toran_1.id}> <@{toran_2.id}>')
+            await context.send('תורני הניקיון והפריסה להיום - ' + f'<@{toran_1.id}> <@{toran_2.id}>')
 
         if not found_today:
             await context.send('לא נמצאו תורני ניקיון להיום')
