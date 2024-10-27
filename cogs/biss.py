@@ -138,6 +138,32 @@ class Biss(commands.Cog, name="biss"):
                               )
 
     @commands.hybrid_command(
+        name="weekly",
+        description="Daily greeting and mentions @everyone. Also reminds of Doh Ehad",
+    )
+    async def weekly(self, context: Context):
+        """
+        This command sends a daily greeting and mentions @everyone, for use in automation. Also reminds of Doh Ehad
+
+        :param context: The application command context.
+        """
+        async with aiohttp.ClientSession() as session:
+            await context.send('@everyone ' + 'שבוע טוב בי"ס מצוב!' + '\n' + 'לא לשכוח למלא דו"ח 1!')
+
+    @commands.hybrid_command(
+        name="daily",
+        description="Daily greeting and mentions @everyone",
+    )
+    async def daily(self, context: Context):
+        """
+        This command sends a daily greeting and mentions @everyone, for use in automation
+
+        :param context: The application command context.
+        """
+        async with aiohttp.ClientSession() as session:
+            await context.send('@everyone ' + 'בוקר טוב בי"ס מצוב!')
+
+    @commands.hybrid_command(
         name="nikayon",
         description="This command gives you today's 'toraney nikayon'",
     )
