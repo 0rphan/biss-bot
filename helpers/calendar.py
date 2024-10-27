@@ -74,6 +74,7 @@ def get_daily_events(calendar_id: str, day: datetime.datetime = None) -> Optiona
     :param calendar_id: Id of calendar to query, used by google api.
     :param day: Day to get events from. If none, uses today's date
     """
+    CALENDAR_DATE_FORMAT = '%Y-m-%d'
     today_base = day
     if not today_base:
         today_base = datetime.datetime.today()
@@ -101,7 +102,11 @@ def get_daily_events(calendar_id: str, day: datetime.datetime = None) -> Optiona
             .execute()
         )
 
-        return events_result.get("items", [])
+        events_list = events_result.get("items", [])
+
+        return [event for event in events_list if (event['start'].get('date', False)
+                                                  and datetime.datetime.strptime(event['start']['date'], '%Y-%m-%d') == today)
+                                                  or not event['start'].get('date', False)]
 
     except HttpError as error:
         logger.error(f"An error occurred: {error}")

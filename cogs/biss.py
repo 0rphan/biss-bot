@@ -76,11 +76,9 @@ class Biss(commands.Cog, name="biss"):
 
             start = None
             end = None
-            is_all_day = bool(event["start"].get("dateTime", False))
-            if not is_all_day:
+            is_all_day = not bool(event["start"].get("dateTime", False))
+            if is_all_day:
                 start = event["start"]["date"]
-                if datetime.datetime.strptime(date, self.DATE_FORMAT) < datetime.datetime.strptime(start, '%Y-%m-%d'):
-                    continue
                 end = 'כל היום'
             else:
                 start_time = datetime.datetime.fromisoformat(event["start"]["dateTime"])
@@ -89,6 +87,7 @@ class Biss(commands.Cog, name="biss"):
                 end_hour = end_time.strftime(self.TIME_FORMAT)
                 start = start_hour
                 end = end_hour
+
             embed.add_field(name='',
                             value=f'{start} - {end} : {event["summary"]}',
                             inline=False)
@@ -179,6 +178,7 @@ class Biss(commands.Cog, name="biss"):
 
         found_today = False
         for event in today_events:
+            print(event)
             event_type, *data = str(event["summary"]).split(self.CALENDAR_DELIMITER, 2)
             if not event_type == 'תורני ניקיון ופריסה':
                 continue
