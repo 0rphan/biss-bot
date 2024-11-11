@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Context
 
-def get_channel_members(context: Context) -> list[discord.Member]:
+def get_channel_members(context: Context):
     guild = context.message.channel.guild
     return guild.members
 

@@ -7,7 +7,7 @@ import toml
 import schedule
 from discord_webhook import DiscordWebhook
 
-def schedule_webhook(config: dict[str, Any]):
+def schedule_webhook(config: dict):
     """
     Schedule a webhook to occur, time based on the config.toml file
 
