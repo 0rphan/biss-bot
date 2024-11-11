@@ -71,7 +71,7 @@ def parse_event_format(event_name: str):
     *data, event_action = event_name.split(' | ')
     return event_action, data
 
-def get_daily_events(calendar_id: str, day: datetime.datetime = None) -> Optional[list[dict[str, Any]]]:
+def get_daily_events(calendar_id: str, day: datetime.datetime = None):
     """
     Get all events from calender in a specific date
 
