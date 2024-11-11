@@ -67,6 +67,10 @@ def get_available_calendars():
         logger.error(f"An error occurred: {error}")
         return None
 
+def parse_event_format(event_name: str):
+    *data, event_action = event_name.split(' | ')
+    return event_action, data
+
 def get_daily_events(calendar_id: str, day: datetime.datetime = None) -> Optional[list[dict[str, Any]]]:
     """
     Get all events from calender in a specific date
@@ -111,3 +115,24 @@ def get_daily_events(calendar_id: str, day: datetime.datetime = None) -> Optiona
     except HttpError as error:
         logger.error(f"An error occurred: {error}")
         return None
+
+def get_daily_action_events(calendar_id: str, action_id: str, day: datetime.datetime = None):
+    """
+    Generator returning all events that match a specific action in their name (according to the format)
+
+    :param calendar_id: Google Calendar id
+    :param action_id: Event action name (i.e מדרת)
+    :param day: datetime object of day to query
+
+    :returns tuple[str, list[str], dict]:
+    Tuple containing action_id, event participants parsed from name, event dict
+    """
+    daily_events = get_daily_events(calendar_id, day)
+
+    if not daily_events:
+        return None
+
+    for event in daily_events:
+        event_action, event_data = parse_event_format(str(event['summary']))
+        if event_action == action_id:
+            yield event_action, event_data, event

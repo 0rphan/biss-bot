@@ -7,7 +7,13 @@ sync_commands_globally = false
 owners = [263731878622789633, 413395214267449344]
 
 [calendar]
-main_id = "<ENTER_ID>"
+segel_main_id = "<ENTER CALENDAR ID>"
+students_main_id = "<ENTER CALENDAR ID>"
+segel_tactical_id = "<ENTER CALENDAR ID>"
+students_research_id = "<ENTER CALENDAR ID>"
+students_firmware_id = "<ENTER CALENDAR ID>"
+students_validation_id = "<ENTER CALENDAR ID>"
+students_development_id = "<ENTER CALENDAR ID>"
 
 # This is an example of schedule configuration
 
@@ -15,4 +21,4 @@ main_id = "<ENTER_ID>"
 # days = [0, 1, 2, 3, 4, 5, 6]      List of weekdays to run the command, ranging from 0 (sunday) to 6 (saturday)
 # hour = "10:00"                    Time to run the command, in %H:%M:%S format
 # url = "<ENTER_WEBHOOK_URL>"       Webhook URL to the chat the message should be sent in
-# content = "<ENTER_CONTENT>"       Message content
+# content = "<ENTER_CONTENT>"       Message content, note that as of now the message is deleted in 10 secs (and this feature is used to trigger bot commands)

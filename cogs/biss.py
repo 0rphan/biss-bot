@@ -40,33 +40,25 @@ class Biss(commands.Cog, name="biss"):
                 description="Hanich Hanichi\nהערות משמעות: 69", color=0xD75BF4)
             await context.send(embed=embed)
 
-    @commands.hybrid_command(
-        name="looz",
-        description="This command gives you today's looz. Can also take a date in the format dd-mm-yyyy as input.",
-    )
-    @checks.not_blacklisted()
-    async def looz(self, context: Context, date: str = None):
-        """"
-        This command gives you today's looz
-        Can also take a date in the format dd-mm-yyyy as input.
+    async def looz_generic(self, context: Context, date: datetime.datetime, calendar_id: str, calendar_name: str, notify_empty: bool):
 
-        :param context: The application command context.
-        """
-        if not date:
-            date = datetime.datetime.today().strftime(self.DATE_FORMAT)
+        if not calendar_id:
+            return
 
-        events = calendar.get_daily_events(self.config['calendar']['main_id'], datetime.datetime.strptime(date, self.DATE_FORMAT))
+        events = calendar.get_daily_events(calendar_id, date)
         if events is None:
             return
 
+        embed = discord.Embed(title=f'לו"ז - {calendar_name}', color=0xD75BF4)
+
         if not events:
-            async with aiohttp.ClientSession() as session:
-                embed = discord.Embed(
-                    description='אין לו"ז להיום! חבורת חפשנים!', color=0xD75BF4)
-                await context.send(embed=embed)
+            if notify_empty:
+                async with aiohttp.ClientSession() as session:
+                    embed.description = 'אין לו"ז להיום! חבורת חפשנים!'
+                    await context.send(embed=embed)
             return
 
-        embed = discord.Embed(title='לו"ז להיום', color=0xD75BF4)
+        embed = discord.Embed(title=f'לו"ז - {calendar_name}', color=0xD75BF4)
 
         for index, event in enumerate(events):
             if index and index % 25 == 0:  # Max amount of fields in a single embed
@@ -95,46 +87,122 @@ class Biss(commands.Cog, name="biss"):
         async with aiohttp.ClientSession() as session:
             await context.send(embed=embed)
 
+
     @commands.hybrid_command(
-        name="madrat",
-        description="This command gives you today's madrat",
+        name="looz",
+        description="This command gives you today's looz. Can also take a date in the format dd-mm-yyyy as input.",
     )
-    async def madrat(self, context: Context):
-        """
-        This command gives you today's and tomorrow's madrat
+    @checks.not_blacklisted()
+    async def looz(self, context: Context, day_offset: str = "0"):
+        """"
+        This command gives you today's looz
+        Can also take a date in the format dd-mm-yyyy as input.
 
         :param context: The application command context.
         """
         today = datetime.datetime.today()
+        today = today + datetime.timedelta(days=int(day_offset))
+        date = datetime.datetime(year=today.year, month=today.month, day=today.day)
+
+        await self.looz_generic(context,
+                                date,
+                                self.config['calendar']['segel_main_id'],
+                                'סגל כללי',
+                                True)
+        await self.looz_generic(context,
+                                date,
+                                self.config['calendar']['students_main_id'],
+                                'חניכים כללי',
+                                True)
+
+        await self.looz_generic(context,
+                                date,
+                                self.config['calendar']['students_development_id'],
+                                'חניכים פיתוח',
+                                False)
+        await self.looz_generic(context,
+                                date,
+                                self.config['calendar']['students_research_id'],
+                                'חניכים מחקר',
+                                False)
+        await self.looz_generic(context,
+                                date,
+                                self.config['calendar']['students_firmware_id'],
+                                'חניכים קושחה',
+                                False)
+        await self.looz_generic(context,
+                                date,
+                                self.config['calendar']['students_validation_id'],
+                                'חניכים ולידציה',
+                                False)
+
+    @commands.hybrid_command(
+        name="madrat",
+        description="This command gives you today's madrat",
+    )
+    async def madrat(self, context: Context, day_offset: str = "0"):
+        """
+        This command gives you today's and tomorrow's madrat
+
+        :param context: The application command context.
+        :param day_offset: Integer offset in days to today
+        """
+        today = datetime.datetime.today()
+        today = today + datetime.timedelta(days=int(day_offset))
         tomorrow = today + datetime.timedelta(days=1)
 
-        today_events = calendar.get_daily_events(self.config['calendar']['main_id'], today)
-        tomorrow_events = calendar.get_daily_events(self.config['calendar']['main_id'], tomorrow)
+        madrat_today = list(calendar.get_daily_action_events(self.config['calendar']['segel_main_id'],
+                                                             'מדרת',
+                                                             today))
+        madrat_tomorrow = list(calendar.get_daily_action_events(self.config['calendar']['segel_main_id'],
+                                                                'מדרת',
+                                                                tomorrow))
 
-        found_today, found_tomorrow = False, False
+        async with aiohttp.ClientSession() as session:
+            if not madrat_today:
+                await context.send('לא נמצא מדר"ת להיום')
+            else:
+                madrat = discord_tools.match_channel_member(context, madrat_today[0][1][0])
+                await context.send('המדר"ת להיום - ' + f'<@{madrat.id}>')
 
-        for event in today_events:
-            event_type, *data = str(event["summary"]).split(self.CALENDAR_DELIMITER, 2)
-            if not event_type == 'מדרת':
-                continue
-            found_today = True
-            madrat = discord_tools.match_channel_member(context, data[0])
-            await context.send('@everyone ' + 'המדר"ת להיום - ' + f'<@{madrat.id}>')
+            if not madrat_tomorrow:
+                await context.send('לא נמצא מדר"ת למחר')
+            else:
+                madrat = discord_tools.match_channel_member(context, madrat_tomorrow[0][1][0])
+                await context.send('המדר"ת למחר - ' + f'<@{madrat.id}>')
 
-        for event in tomorrow_events:
-            event_type, *data = str(event["summary"]).split(self.CALENDAR_DELIMITER, 2)
-            if not event_type == 'מדרת':
-                continue
-            found_tomorrow = True
-            madrat = discord_tools.match_channel_member(context, data[0])
-            await context.send('המדר"ת למחר - ' + f'<@{madrat.id}>')
+    @commands.hybrid_command(
+        name="nikayon",
+        description="This command gives you today's 'toraney nikayon'",
+    )
+    async def nikayon(self, context: Context, day_offset: str = "0"):
+        """
+        This command gives you today's 'toraney nikayon'
 
-        if not all([found_today, found_tomorrow]):
-            await context.send('לא נמצא מדרת - ' +
-                               ('היום' if not found_today else '') +
-                               (' ו' if not (found_today and found_tomorrow) else '') +
-                               ('מחר' if not found_tomorrow else '')
-                              )
+        :param context: The application command context.
+        """
+        today = datetime.datetime.today()
+        today = today + datetime.timedelta(days=int(day_offset))
+
+        toranim_today = list(calendar.get_daily_action_events(self.config['calendar']['segel_main_id'],
+                                                              'תורני ניקיון ופריסה',
+                                                              today))
+
+        async with aiohttp.ClientSession() as session:
+            if not toranim_today:
+                await context.send('לא נמצאו תורני ניקיון להיום')
+                return
+
+            message = 'תורני ניקיון ופריסה להיום - '
+            _, toranim, _ = toranim_today[0]
+            for toran in toranim:
+                toran_member = discord_tools.match_channel_member(context, toran)
+                if not toran_member:
+                    await context.send(f'נמצאה שגיאה בשם אחד מתורני הניקיון - {toran}')
+                    continue
+                message += f'<@{toran_member.id}> '
+
+            await context.send(message)
 
     @commands.hybrid_command(
         name="weekly",
@@ -161,39 +229,6 @@ class Biss(commands.Cog, name="biss"):
         """
         async with aiohttp.ClientSession() as session:
             await context.send('@everyone ' + 'בוקר טוב בי"ס מצוב!')
-
-    @commands.hybrid_command(
-        name="nikayon",
-        description="This command gives you today's 'toraney nikayon'",
-    )
-    async def nikayon(self, context: Context):
-        """
-        This command gives you today's 'toraney nikayon'
-
-        :param context: The application command context.
-        """
-        today = datetime.datetime.today()
-
-        today_events = calendar.get_daily_events(self.config['calendar']['main_id'], today)
-
-        found_today = False
-        for event in today_events:
-            print(event)
-            event_type, *data = str(event["summary"]).split(self.CALENDAR_DELIMITER, 2)
-            if not event_type == 'תורני ניקיון ופריסה':
-                continue
-            found_today = True
-            toran_1 = discord_tools.match_channel_member(context, data[0])
-            toran_2 = discord_tools.match_channel_member(context, data[1])
-
-            if toran_1 is None or toran_2 is None:
-                await context.send('השם של אחד התורנים בקאלנדר לא נמצא בשרת! ככל הנראה מדובר בשגיאת כתיב.')
-                return
-
-            await context.send('תורני הניקיון והפריסה להיום - ' + f'<@{toran_1.id}> <@{toran_2.id}>')
-
-        if not found_today:
-            await context.send('לא נמצאו תורני ניקיון להיום')
 
     @commands.hybrid_command(
         name="sahi",
