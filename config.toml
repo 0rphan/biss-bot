@@ -21,4 +21,4 @@ students_development_id = "<ENTER CALENDAR ID>"
 # days = [0, 1, 2, 3, 4, 5, 6]      List of weekdays to run the command, ranging from 0 (sunday) to 6 (saturday)
 # hour = "10:00"                    Time to run the command, in %H:%M:%S format
 # url = "<ENTER_WEBHOOK_URL>"       Webhook URL to the chat the message should be sent in
-# content = "<ENTER_CONTENT>"       Message content, note that as of now the message is deleted in 10 secs (and this feature is used to trigger bot commands)
+# content = "<ENTER_CONTENT>"       Message content, note that as of now the message is deleted in 5 secs (and this feature is used to trigger bot commands)
